@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet"
 
 
 interface Product {
@@ -184,18 +185,30 @@ export default function Home() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Button variant="outline" size="icon">
+          <Button variant="ghost" size="icon">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="default" className="relative">
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Cart
-            {getTotalItems() > 0 && (
-              <Badge className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 text-xs">
-                {getTotalItems()}
-              </Badge>
-            )}
-          </Button>
+          <Sheet>
+              <SheetTrigger asChild>
+                  <Button variant="default" className="relative">
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Cart
+                      {getTotalItems() > 0 && (
+                          <Badge className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 text-xs">
+                              {getTotalItems()}
+                          </Badge>
+                      )}
+                  </Button>
+              </SheetTrigger>
+              <SheetContent>
+                  <SheetHeader>
+                      <SheetTitle>Shopping Cart</SheetTitle>
+                      <SheetDescription>
+                          Review and manage your cart items.
+                      </SheetDescription>
+                  </SheetHeader>
+              </SheetContent>
+          </Sheet>
         </div>
       </header>
 
