@@ -1,5 +1,30 @@
-# Firebase Studio
+# VeggieGo Mobile App
 
-This is a NextJS starter in Firebase Studio.
+This is a mobile application built with Flutter for a local vegetable vendor.
 
-To get started, take a look at src/app/page.tsx.
+## Getting Started
+
+To run this application, you need to have Flutter installed on your machine.
+
+1.  Clone the repository:
+
+    ```bash
+    git clone <repository_url>
+    cd veggiego
+    ```
+
+2.  Install dependencies:
+
+    ```bash
+    flutter pub get
+    ```
+
+3.  Run the app:
+
+    ```bash
+    flutter run
+    ```
+
+## Web Support
+
+Web support has been removed to focus on mobile deployment.
