@@ -25,7 +25,6 @@ import {
   SheetClose,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import {processPayment, PaymentResult} from '@/ai/flows/process-payment-flow';
 import {
   Form,
   FormControl,
@@ -39,6 +38,7 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Textarea} from '@/components/ui/textarea';
 import {ShoppingCart as ShoppingCartIcon} from 'lucide-react';
+import {processPayment} from '@/ai/flows/process-payment-flow';
 
 interface Product {
   id: number;
@@ -222,23 +222,24 @@ export default function Home() {
   const handleCheckout = async (values: PaymentValues) => {
     setIsCheckingOut(true);
     try {
-      const paymentInfo = {
+      // TODO: Use the genkit flow to process payment
+      const paymentResult = await processPayment({
         cardNumber: values.cardNumber,
         expiryDate: values.expiryDate,
         cvv: values.cvv,
         amount: getTotalPrice(),
-      };
-      const result: PaymentResult = await processPayment(paymentInfo);
-      if (result.success) {
+      });
+
+      if (paymentResult.success) {
         toast({
           title: 'Payment Successful!',
-          description: result.message,
+          description: paymentResult.message || 'Thank you for your order!',
         });
         setCart({}); // Clear the cart after successful payment
       } else {
         toast({
           title: 'Payment Failed!',
-          description: result.message,
+          description: paymentResult.message || 'Please check your card details and try again.',
           variant: 'destructive',
         });
       }
@@ -260,201 +261,207 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <Toaster />
-      {/* Header */}
-      <header className="bg-secondary p-4 flex justify-between items-center">
-        <div className="font-bold text-xl">VeggieGo</div>
-        <div className="flex items-center space-x-4">
-          <Input
-            type="text"
-            placeholder="Search fruits and vegetables..."
-            className="max-w-xs rounded-full"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-          <Button variant="ghost" size="icon" className="bg-transparent">
-            <Search className="h-4 w-4" />
-          </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="default" className="relative">
-                <ShoppingCartIcon className="h-4 w-4 mr-2" />
-                Cart
-                {getTotalItems() > 0 && (
-                  <Badge className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 text-xs">
-                    {getTotalItems()}
-                  </Badge>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Shopping Cart</SheetTitle>
-                <SheetDescription>Review and manage your cart items.</SheetDescription>
-              </SheetHeader>
-              <div className="mt-4">
-                {filteredCartItems.length === 0 ? (
-                  <p>Your cart is empty.</p>
-                ) : (
-                  <ul>
-                    {filteredCartItems.map(product => (
-                      <li
-                        key={product.id}
-                        className="flex items-center justify-between py-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Image
-                            src={product.imageUrl}
-                            alt={product.name}
-                            width={50}
-                            height={50}
-                            className="rounded-md"
-                          />
-                          <div>
-                            <p className="font-medium">{product.name}</p>
-                            <p className="text-sm text-gray-500">
-                              ${product.price.toFixed(2)} x {cart[product.id]}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => decreaseQuantity(product)}
-                          >
-                            -
-                          </Button>
-                          <span className="mx-2">{cart[product.id]}</span>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => increaseQuantity(product)}
-                          >
-                            +
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div className="mt-4">
-                <div className="flex justify-between font-medium">
-                  <span>Total:</span>
-                  <span>${getTotalPrice().toFixed(2)}</span>
-                </div>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleCheckout)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="cardNumber"
-                      render={({field}) => (
-                        <FormItem>
-                          <FormLabel>Card Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter card number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="expiryDate"
-                      render={({field}) => (
-                        <FormItem>
-                          <FormLabel>Expiry Date</FormLabel>
-                          <FormControl>
-                            <Input placeholder="MM/YY" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="cvv"
-                      render={({field}) => (
-                        <FormItem>
-                          <FormLabel>CVV</FormLabel>
-                          <FormControl>
-                            <Input placeholder="CVV" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button className="w-full mt-4" disabled={isCheckingOut}>
-                      {isCheckingOut ? 'Processing...' : 'Checkout'}
-                    </Button>
-                    <SheetClose asChild>
-                      <Button type="button" variant="ghost">
-                        Cancel
-                      </Button>
-                    </SheetClose>
-                  </form>
-                </Form>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="container mx-auto py-8">
-        <h1 className="text-2xl font-bold text-center mb-8">Fresh Fruits and Vegetables</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map(product => (
-            <Card key={product.id} className="bg-card rounded-lg shadow-md overflow-hidden">
-              <Image
-                src={product.imageUrl}
-                alt={product.name}
-                width={200}
-                height={150}
-                className="w-full h-32 object-cover"
-              />
-              <CardHeader>
-                <CardTitle>{product.name}</CardTitle>
-                <CardDescription>{product.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Price: ${product.price.toFixed(2)}</p>
-              </CardContent>
-              <CardFooter className="flex flex-col space-y-2">
-                <Button className="w-full" onClick={() => addToCart(product)}>
-                  Add to Cart
+    (
+      <div className="min-h-screen bg-background">
+        <Toaster />
+        {/* Header */}
+        <header className="bg-secondary p-4 flex justify-between items-center">
+          <div className="font-bold text-xl">VeggieGo: Fruits and Vegetables</div>
+          <div className="flex items-center space-x-4">
+            <Input
+              type="text"
+              placeholder="Search fruits and vegetables..."
+              className="max-w-xs rounded-full"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            <Button variant="ghost" size="icon" className="bg-transparent">
+              <Search className="h-4 w-4" />
+            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="default" className="relative">
+                  <ShoppingCartIcon className="h-4 w-4 mr-2" />
+                  Cart
+                  {getTotalItems() > 0 && (
+                    <Badge className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 text-xs">
+                      {getTotalItems()}
+                    </Badge>
+                  )}
                 </Button>
-                {cart[product.id] > 0 && (
-                  <div className="flex items-center justify-between">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => decreaseQuantity(product)}
-                    >
-                      -
-                    </Button>
-                    <span>Quantity: {cart[product.id]}</span>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => increaseQuantity(product)}
-                    >
-                      +
-                    </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Shopping Cart</SheetTitle>
+                  <SheetDescription>Review and manage your cart items.</SheetDescription>
+                </SheetHeader>
+                <div className="mt-4">
+                  {filteredCartItems.length === 0 ? (
+                    <p>Your cart is empty.</p>
+                  ) : (
+                    <ul>
+                      {filteredCartItems.map(product => (
+                        <li
+                          key={product.id}
+                          className="flex items-center justify-between py-2"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.name}
+                              width={50}
+                              height={50}
+                              className="rounded-md"
+                            />
+                            <div>
+                              <p className="font-medium">{product.name}</p>
+                              <p className="text-sm text-gray-500">
+                                ${product.price.toFixed(2)} x {cart[product.id]}
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="mx-1 px-2" // Add margin and decrease padding
+                              onClick={() => decreaseQuantity(product)}
+                            >
+                              -
+                            </Button>
+                            <span className="mx-2">{cart[product.id]}</span>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="mx-1 px-2" // Add margin and decrease padding
+                              onClick={() => increaseQuantity(product)}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <div className="flex justify-between font-medium">
+                    <span>Total:</span>
+                    <span>${getTotalPrice().toFixed(2)}</span>
                   </div>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleCheckout)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="cardNumber"
+                        render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Card Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter card number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="expiryDate"
+                        render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Expiry Date</FormLabel>
+                            <FormControl>
+                              <Input placeholder="MM/YY" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="cvv"
+                        render={({field}) => (
+                          <FormItem>
+                            <FormLabel>CVV</FormLabel>
+                            <FormControl>
+                              <Input placeholder="CVV" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button className="w-full mt-4" disabled={isCheckingOut}>
+                        {isCheckingOut ? 'Checking Out...' : 'Checkout'}
+                      </Button>
+                      <SheetClose asChild>
+                        <Button type="button" variant="ghost">
+                          Cancel
+                        </Button>
+                      </SheetClose>
+                    </form>
+                  </Form>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </header>
 
-      {/* Footer */}
-      <footer className="bg-secondary p-4 text-center">
-        <p>© {new Date().getFullYear()} VeggieGo. All rights reserved.</p>
-      </footer>
-    </div>
+        {/* Main Content */}
+        <div className="container mx-auto py-8">
+          <h1 className="text-2xl font-bold text-center mb-8">Fresh Fruits and Vegetables</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map(product => (
+              <Card key={product.id} className="bg-card rounded-lg shadow-md overflow-hidden">
+                <Image
+                  src={product.imageUrl}
+                  alt={product.name}
+                  width={200}
+                  height={150}
+                  className="w-full h-32 object-cover"
+                />
+                <CardHeader>
+                  <CardTitle>{product.name}</CardTitle>
+                  <CardDescription>{product.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">Price: ${product.price.toFixed(2)}</p>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-2">
+                  <Button className="w-full" onClick={() => addToCart(product)}>
+                    Add to Cart
+                  </Button>
+                  {cart[product.id] > 0 && (
+                    <div className="flex items-center justify-between">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="mx-1 px-2" // Add margin and decrease padding
+                        onClick={() => decreaseQuantity(product)}
+                      >
+                        -
+                      </Button>
+                      <span>Quantity: {cart[product.id]}</span>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="mx-1 px-2" // Add margin and decrease padding
+                        onClick={() => increaseQuantity(product)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  )}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-secondary p-4 text-center">
+          <p>© {new Date().getFullYear()} VeggieGo. All rights reserved.</p>
+        </footer>
+      </div>
+    )
   );
 }
