@@ -89,13 +89,13 @@ export default function Home() {
               <h2 className="text-lg font-semibold text-gray-800">{vegetable.name}</h2>
               <p className="mt-2 text-gray-600">Price: ${vegetable.price.toFixed(2)}</p>
               <Button
-                className="mt-4 w-full"
+                className="mt-4 w-full flex items-center justify-center"
                 onClick={() => addToCart(vegetable)}
               >
                 Add to Cart
                 {cart[vegetable.id] > 0 && <Plus className="ml-2 h-4 w-4" />}
               </Button>
-              {cart[vegetable.id] > 0 && (
+             {cart[vegetable.id] > 0 && (
                 <p className="mt-2 text-green-600">Quantity: {cart[vegetable.id]}</p>
               )}
             </div>
