@@ -1,6 +1,16 @@
-import Image from 'next/image';
+'use client'
 
-const vegetables = [
+import Image from 'next/image';
+import { useState } from 'react';
+
+interface Vegetable {
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+}
+
+const vegetables: Vegetable[] = [
   {
     id: 1,
     name: 'Tomato',
@@ -40,6 +50,15 @@ const vegetables = [
 ];
 
 export default function Home() {
+  const [cart, setCart] = useState<{ [id: number]: number }>({});
+
+  const addToCart = (vegetable: Vegetable) => {
+    setCart((prevCart) => ({
+      ...prevCart,
+      [vegetable.id]: (prevCart[vegetable.id] || 0) + 1,
+    }));
+  };
+
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-3xl font-bold text-center mb-8">Welcome to VeggieGo!</h1>
@@ -56,9 +75,15 @@ export default function Home() {
             <div className="p-4">
               <h2 className="text-lg font-semibold text-gray-800">{vegetable.name}</h2>
               <p className="mt-2 text-gray-600">Price: ${vegetable.price.toFixed(2)}</p>
-              <button className="mt-4 bg-primary hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+              <button
+                className="mt-4 bg-primary hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => addToCart(vegetable)}
+              >
                 Add to Cart
               </button>
+              {cart[vegetable.id] > 0 && (
+                <p className="mt-2 text-green-600">Quantity: {cart[vegetable.id]}</p>
+              )}
             </div>
           </div>
         ))}
