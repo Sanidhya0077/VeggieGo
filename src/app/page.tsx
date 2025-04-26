@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet"
+import { Trigger } from "@radix-ui/react-dialog";
 
 
 interface Product {
@@ -120,15 +121,19 @@ export default function Home() {
   }, [searchTerm]);
 
   const addToCart = (product: Product) => {
-    setCart((prevCart) => ({
-      ...prevCart,
-      [product.id]: (prevCart[product.id] || 0) + 1,
-    }));
-    toast({
-      title: "Added to cart!",
-      description: `${product.name} added to your shopping cart.`,
-    })
+    setCart((prevCart) => {
+      const newCart = {
+        ...prevCart,
+        [product.id]: (prevCart[product.id] || 0) + 1,
+      };
+      toast({
+        title: "Added to cart!",
+        description: `${product.name} added to your shopping cart.`,
+      });
+      return newCart;
+    });
   };
+
 
   const removeFromCart = (product: Product) => {
         setCart((prevCart) => {
@@ -171,6 +176,9 @@ export default function Home() {
     }, 0);
   };
 
+    const cartItems = products.filter(product => cart[product.id] > 0);
+
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
@@ -185,7 +193,7 @@ export default function Home() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="bg-transparent">
             <Search className="h-4 w-4" />
           </Button>
           <Sheet>
@@ -207,6 +215,51 @@ export default function Home() {
                           Review and manage your cart items.
                       </SheetDescription>
                   </SheetHeader>
+                  <div className="mt-4">
+                        {cartItems.length === 0 ? (
+                            <p>Your cart is empty.</p>
+                        ) : (
+                            <ul>
+                                {cartItems.map((product) => (
+                                    <li key={product.id} className="flex items-center justify-between py-2">
+                                        <div className="flex items-center space-x-2">
+                                            <Image
+                                                src={product.imageUrl}
+                                                alt={product.name}
+                                                width={50}
+                                                height={50}
+                                                className="rounded-md"
+                                            />
+                                            <div>
+                                                <p className="font-medium">{product.name}</p>
+                                                <p className="text-sm text-gray-500">
+                                                    ${product.price.toFixed(2)} x {cart[product.id]}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <Button variant="secondary" size="sm" onClick={() => decreaseQuantity(product)}>
+                                                -
+                                            </Button>
+                                            <span className="mx-2">{cart[product.id]}</span>
+                                            <Button variant="secondary" size="sm" onClick={() => increaseQuantity(product)}>
+                                                +
+                                            </Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                    <div className="mt-4">
+                        <div className="flex justify-between font-medium">
+                            <span>Total:</span>
+                            <span>${getTotalPrice().toFixed(2)}</span>
+                        </div>
+                        <Button className="w-full mt-4">
+                            Checkout
+                        </Button>
+                    </div>
               </SheetContent>
           </Sheet>
         </div>
@@ -263,3 +316,5 @@ export default function Home() {
     </div>
   );
 }
+
+
