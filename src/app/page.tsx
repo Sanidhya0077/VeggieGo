@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
+import { Search, Plus } from "lucide-react"
 
 interface Vegetable {
   id: number;
@@ -93,6 +93,7 @@ export default function Home() {
                 onClick={() => addToCart(vegetable)}
               >
                 Add to Cart
+                {cart[vegetable.id] > 0 && <Plus className="ml-2 h-4 w-4" />}
               </Button>
               {cart[vegetable.id] > 0 && (
                 <p className="mt-2 text-green-600">Quantity: {cart[vegetable.id]}</p>
