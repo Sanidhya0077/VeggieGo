@@ -98,6 +98,19 @@ export default function Home() {
              {cart[vegetable.id] > 0 && (
                 <p className="mt-2 text-green-600">Quantity: {cart[vegetable.id]}</p>
               )}
+              {cart[vegetable.id] > 0 && (
+                  <Button
+                      variant="secondary"
+                      size="sm"
+                      className="mt-2 w-full"
+                      onClick={() => setCart(prevCart => ({
+                        ...prevCart,
+                        [vegetable.id]: (prevCart[vegetable.id] || 1) + 1,
+                      }))}
+                  >
+                    + Add to Quantity
+                  </Button>
+              )}
             </div>
           </div>
         ))}
