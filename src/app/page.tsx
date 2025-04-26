@@ -4,7 +4,7 @@ import Image from 'next/image';
 import {useState, useEffect} from 'react';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
-import {Search, ShoppingCart} from 'lucide-react';
+import {Search} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -23,6 +23,7 @@ import {
   SheetTitle,
   SheetDescription,
   SheetClose,
+  SheetTrigger,
 } from '@/components/ui/sheet';
 import {processPayment, PaymentResult} from '@/ai/flows/process-payment-flow';
 import {
@@ -457,4 +458,3 @@ export default function Home() {
     </div>
   );
 }
-
