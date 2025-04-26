@@ -2,6 +2,9 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
 
 interface Vegetable {
   id: number;
@@ -60,11 +63,21 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold text-center mb-8">Welcome to VeggieGo!</h1>
+    <div className="container mx-auto py-8">
+      {/* Search Bar */}
+      <div className="flex items-center justify-center mb-8">
+        <div className="relative w-1/2">
+          <Input type="text" placeholder="Search for vegetables..." className="rounded-full pl-5 pr-12" />
+          <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2">
+            <Search className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <h1 className="text-2xl font-bold text-center mb-4">Fresh Vegetables</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {vegetables.map((vegetable) => (
-          <div key={vegetable.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div key={vegetable.id} className="bg-card rounded-lg shadow-md overflow-hidden">
             <Image
               src={vegetable.imageUrl}
               alt={vegetable.name}
@@ -75,12 +88,12 @@ export default function Home() {
             <div className="p-4">
               <h2 className="text-lg font-semibold text-gray-800">{vegetable.name}</h2>
               <p className="mt-2 text-gray-600">Price: ${vegetable.price.toFixed(2)}</p>
-              <button
-                className="mt-4 bg-primary hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+              <Button
+                className="mt-4 w-full"
                 onClick={() => addToCart(vegetable)}
               >
                 Add to Cart
-              </button>
+              </Button>
               {cart[vegetable.id] > 0 && (
                 <p className="mt-2 text-green-600">Quantity: {cart[vegetable.id]}</p>
               )}
