@@ -11,7 +11,7 @@ import { toast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
 
-interface Vegetable {
+interface Product {
   id: number;
   name: string;
   price: number;
@@ -19,7 +19,7 @@ interface Vegetable {
   description: string;
 }
 
-const vegetables: Vegetable[] = [
+const products: Product[] = [
   {
     id: 1,
     name: 'Tomato',
@@ -62,47 +62,89 @@ const vegetables: Vegetable[] = [
     imageUrl: 'https://picsum.photos/200/155',
     description: 'Healthy broccoli, great for steaming and roasting.',
   },
+    {
+    id: 7,
+    name: 'Apple',
+    price: 1.00,
+    imageUrl: 'https://picsum.photos/200/156',
+    description: 'A crisp and sweet apple, perfect for a quick snack.',
+  },
+  {
+    id: 8,
+    name: 'Banana',
+    price: 0.75,
+    imageUrl: 'https://picsum.photos/200/157',
+    description: 'A creamy and convenient banana, great for potassium.',
+  },
+  {
+    id: 9,
+    name: 'Orange',
+    price: 1.25,
+    imageUrl: 'https://picsum.photos/200/158',
+    description: 'A juicy and citrusy orange, rich in Vitamin C.',
+  },
+  {
+    id: 10,
+    name: 'Grapes',
+    price: 2.00,
+    imageUrl: 'https://picsum.photos/200/159',
+    description: 'Sweet and refreshing grapes, perfect for snacking.',
+  },
+  {
+    id: 11,
+    name: 'Strawberry',
+    price: 3.00,
+    imageUrl: 'https://picsum.photos/200/160',
+    description: 'Delicious and vibrant strawberries, great for desserts.',
+  },
+  {
+    id: 12,
+    name: 'Blueberry',
+    price: 4.00,
+    imageUrl: 'https://picsum.photos/200/161',
+    description: 'Antioxidant-rich blueberries, ideal for smoothies and cereals.',
+  },
 ];
 
 export default function Home() {
   const [cart, setCart] = useState<{ [id: number]: number }>({});
 
-  const addToCart = (vegetable: Vegetable) => {
+  const addToCart = (product: Product) => {
     setCart((prevCart) => ({
       ...prevCart,
-      [vegetable.id]: (prevCart[vegetable.id] || 0) + 1,
+      [product.id]: (prevCart[product.id] || 0) + 1,
     }));
     toast({
       title: "Added to cart!",
-      description: `${vegetable.name} added to your shopping cart.`,
+      description: `${product.name} added to your shopping cart.`,
     })
   };
 
-  const removeFromCart = (vegetable: Vegetable) => {
+  const removeFromCart = (product: Product) => {
         setCart((prevCart) => {
             const newCart = {...prevCart};
-            delete newCart[vegetable.id];
+            delete newCart[product.id];
             return newCart;
         });
     };
 
-  const increaseQuantity = (vegetable: Vegetable) => {
+  const increaseQuantity = (product: Product) => {
     setCart((prevCart) => ({
       ...prevCart,
-      [vegetable.id]: (prevCart[vegetable.id] || 0) + 1,
+      [product.id]: (prevCart[product.id] || 0) + 1,
     }));
   };
 
-  const decreaseQuantity = (vegetable: Vegetable) => {
+  const decreaseQuantity = (product: Product) => {
     setCart((prevCart) => {
-      if (prevCart[vegetable.id] > 1) {
+      if (prevCart[product.id] > 1) {
         return {
           ...prevCart,
-          [vegetable.id]: prevCart[vegetable.id] - 1,
+          [product.id]: prevCart[product.id] - 1,
         };
       } else {
         const newCart = { ...prevCart };
-        delete newCart[vegetable.id];
+        delete newCart[product.id];
         return newCart;
       }
     });
@@ -114,8 +156,8 @@ export default function Home() {
   };
 
   const getTotalPrice = () => {
-    return vegetables.reduce((acc, vegetable) => {
-      return acc + (cart[vegetable.id] || 0) * vegetable.price;
+    return products.reduce((acc, product) => {
+      return acc + (cart[product.id] || 0) * product.price;
     }, 0);
   };
 
@@ -126,7 +168,7 @@ export default function Home() {
       <header className="bg-secondary p-4 flex justify-between items-center">
         <div className="font-bold text-xl">VeggieGo</div>
         <div className="flex items-center space-x-4">
-          <Input type="text" placeholder="Search vegetables..." className="max-w-xs rounded-full" />
+          <Input type="text" placeholder="Search fruits and vegetables..." className="max-w-xs rounded-full" />
           <Button variant="outline" size="icon">
             <Search className="h-4 w-4" />
           </Button>
@@ -144,37 +186,37 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="container mx-auto py-8">
-        <h1 className="text-2xl font-bold text-center mb-8">Fresh Vegetables</h1>
+        <h1 className="text-2xl font-bold text-center mb-8">Fresh Fruits and Vegetables</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {vegetables.map((vegetable) => (
-            <Card key={vegetable.id} className="bg-card rounded-lg shadow-md overflow-hidden">
+          {products.map((product) => (
+            <Card key={product.id} className="bg-card rounded-lg shadow-md overflow-hidden">
               <Image
-                src={vegetable.imageUrl}
-                alt={vegetable.name}
+                src={product.imageUrl}
+                alt={product.name}
                 width={200}
                 height={150}
                 className="w-full h-32 object-cover"
               />
               <CardHeader>
-                <CardTitle>{vegetable.name}</CardTitle>
-                <CardDescription>{vegetable.description}</CardDescription>
+                <CardTitle>{product.name}</CardTitle>
+                <CardDescription>{product.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">Price: ${vegetable.price.toFixed(2)}</p>
+                <p className="text-gray-600">Price: ${product.price.toFixed(2)}</p>
               </CardContent>
               <CardFooter className="flex flex-col space-y-2">
-                 {cart[vegetable.id] > 0 ? (
+                 {cart[product.id] > 0 ? (
                     <div className="flex items-center justify-between">
-                      <Button variant="secondary" size="sm" onClick={() => decreaseQuantity(vegetable)}>
+                      <Button variant="secondary" size="sm" onClick={() => decreaseQuantity(product)}>
                         -
                       </Button>
-                      <span>Quantity: {cart[vegetable.id]}</span>
-                      <Button variant="secondary" size="sm" onClick={() => increaseQuantity(vegetable)}>
+                      <span>Quantity: {cart[product.id]}</span>
+                      <Button variant="secondary" size="sm" onClick={() => increaseQuantity(product)}>
                         +
                       </Button>
                     </div>
                   ) : (
-                    <Button className="w-full" onClick={() => addToCart(vegetable)}>
+                    <Button className="w-full" onClick={() => addToCart(product)}>
                       Add to Cart
                     </Button>
                   )}
