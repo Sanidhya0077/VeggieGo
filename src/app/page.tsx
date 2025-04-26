@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, ShoppingCart } from "lucide-react"
@@ -108,6 +108,15 @@ const products: Product[] = [
 
 export default function Home() {
   const [cart, setCart] = useState<{ [id: number]: number }>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+
+  useEffect(() => {
+    const results = products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProducts(results);
+  }, [searchTerm]);
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => ({
@@ -168,7 +177,13 @@ export default function Home() {
       <header className="bg-secondary p-4 flex justify-between items-center">
         <div className="font-bold text-xl">VeggieGo</div>
         <div className="flex items-center space-x-4">
-          <Input type="text" placeholder="Search fruits and vegetables..." className="max-w-xs rounded-full" />
+          <Input
+            type="text"
+            placeholder="Search fruits and vegetables..."
+            className="max-w-xs rounded-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <Button variant="outline" size="icon">
             <Search className="h-4 w-4" />
           </Button>
@@ -188,7 +203,7 @@ export default function Home() {
       <div className="container mx-auto py-8">
         <h1 className="text-2xl font-bold text-center mb-8">Fresh Fruits and Vegetables</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <Card key={product.id} className="bg-card rounded-lg shadow-md overflow-hidden">
               <Image
                 src={product.imageUrl}
