@@ -248,6 +248,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int previousTotalItems = -1; // Initialize to a value unlikely to match
+    double previousTotalWeight = -1.0; // Same logic here
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -279,15 +281,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 15,
                 color: Colors.white70,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
         centerTitle: true,
         toolbarHeight: 100, // Fixed height for AppBar
         actions: [
-          Stack(
-            alignment: Alignment.topRight,
-            children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16,top: 16),  
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
               IconButton(
                 icon: const Icon(Icons.shopping_cart, size: 20),
                 onPressed: () {
@@ -305,17 +310,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-              if (_totalItems > 0)
+             
+              if (_cart.length > 0 && (_cart.length != previousTotalItems))
                 CircleAvatar(
                   radius: 8,
                   backgroundColor: Colors.yellow,
                   child: Text(
-                    '${_totalItems}\n${_totalWeight.toStringAsFixed(1)}kg',
+                    '${_cart.length}',
                     style: const TextStyle(fontSize: 7, color: Colors.black),
                     textAlign: TextAlign.center,
                   ),
                 ),
             ],
+          ),
           ),
         ],
       ),
@@ -408,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).colorScheme.secondary,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(4.0),
           child: Text(
             '© ${DateTime.now().year} VeggieGo. All rights reserved.',
             textAlign: TextAlign.center,
@@ -464,7 +471,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   ),
                   title: Text(product.name),
                   subtitle: Text(
-                      '₹${product.price.toStringAsFixed(0)} × ${widget.cart[product.id]} (${(product.quantity * widget.cart[product.id]!).toStringAsFixed(2)}kg)'),
+                      '₹${product.price.toStringAsFixed(0)} × ${widget.cart[product.id]} = ₹${(product.price * widget.cart[product.id]!).toStringAsFixed(2)}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -509,14 +516,14 @@ bottomNavigationBar: BottomAppBar(
     width: double.infinity,
     child: ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF2E7D32),
+        // backgroundColor: const Color(0xFF2E7D32),
         elevation: 8,
         minimumSize: const Size(double.infinity, 56), // Full width and fixed height
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
-        shadowColor: Colors.green[700],
+        // shadowColor: Colors.green[700],
         alignment: Alignment.center, // Ensure center alignment
         
       ),
@@ -539,7 +546,7 @@ bottomNavigationBar: BottomAppBar(
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
+                  color: Colors.black,
                 ),
               ),
               Text(
