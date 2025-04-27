@@ -80,8 +80,26 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation platform('com.google.firebase:firebase-bom:32.7.2')
-    implementation 'com.google.firebase:firebase-analytics'
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    // implementation platform('com.google.firebase:firebase-bom:32.7.2')
+    // implementation 'com.google.firebase:firebase-analytics'
+    // implementation 'com.google.firebase:firebase-auth'
+    // implementation 'com.google.firebase:firebase-firestore'
+    // implementation 'com.google.firebase:firebase-storage'
+    // implementation 'com.google.firebase:firebase-messaging'
+    // implementation 'com.google.firebase:firebase-database'
+    // implementation 'com.google.firebase:firebase-crashlytics'
+    // implementation 'com.google.gms:google-services:4.3.10'
+    // implementation 'com.google.firebase:firebase-appcheck-safetynet'
+    // implementation 'com.google.firebase:firebase-appcheck-debug'
+    // implementation 'com.google.firebase:firebase-appcheck-playintegrity'
+    // implementation 'com.google.firebase:firebase-appcheck-ktx'
+    // implementation 'com.google.firebase:firebase-appcheck-common-ktx'
+    // implementation 'com.google.firebase:firebase-appcheck-safetynet-ktx'
+    // implementation 'com.google.firebase:firebase-appcheck-debug-ktx'
+    // implementation 'com.google.firebase:firebase-appcheck-playintegrity-ktx'
+    // implementation 'com.google.firebase:firebase-appcheck-common-ktx'
+    // implementation 'com.google.firebase:firebase-appcheck-safetynet-ktx'
 }
-apply plugin: 'com.google.gms.google-services'
+
+// apply plugin: 'com.google.gms.google-services'

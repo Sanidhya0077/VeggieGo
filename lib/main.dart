@@ -46,91 +46,142 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class SearchBar extends StatelessWidget {
+  final Function(String) onSearch;
+
+  const SearchBar({
+    super.key,
+    required this.onSearch,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.search, color: Colors.white70, size: 18),
+          const SizedBox(width: 6),
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Search...',
+                border: InputBorder.none,
+                hintStyle: TextStyle(color: Colors.white70, fontSize: 12),
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              onChanged: onSearch,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _HomeScreenState extends State<HomeScreen> {
   final List<Product> products = [
     Product(
       id: 1,
       name: 'Tomato',
-      price: 2.5,
-      imageUrl: 'https://picsum.photos/200/150',
+      price: 40.0,
+      imageUrl: 'https://images.pexels.com/photos/533280/pexels-photo-533280.jpeg',
       description: 'A juicy and red tomato, perfect for salads and sauces.',
+      quantity: 1.0,
     ),
     Product(
       id: 2,
       name: 'Cucumber',
-      price: 1.75,
-      imageUrl: 'https://picsum.photos/200/151',
+      price: 30.0,
+      imageUrl: 'https://images.pexels.com/photos/3568039/pexels-photo-3568039.jpeg',
       description: 'A crisp and refreshing cucumber, great for hydration.',
+      quantity: 1.0,
     ),
     Product(
       id: 3,
       name: 'Spinach',
-      price: 3.0,
-      imageUrl: 'https://picsum.photos/200/152',
+      price: 45.0,
+      imageUrl: 'https://images.pexels.com/photos/2325843/pexels-photo-2325843.jpeg',
       description: 'Nutrient-rich spinach, ideal for smoothies and stir-fries.',
+      quantity: 0.5,
     ),
     Product(
       id: 4,
       name: 'Carrot',
-      price: 1.25,
-      imageUrl: 'https://picsum.photos/200/153',
+      price: 25.0,
+      imageUrl: 'https://images.pexels.com/photos/1306559/pexels-photo-1306559.jpeg',
       description: 'Crunchy and sweet carrot, a healthy snack option.',
+      quantity: 1.0,
     ),
     Product(
       id: 5,
       name: 'Bell Pepper',
-      price: 2.0,
-      imageUrl: 'https://picsum.photos/200/154',
+      price: 60.0,
+      imageUrl: 'https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg',
       description: 'Colorful bell pepper, perfect for adding flavor to any dish.',
+      quantity: 0.5,
     ),
     Product(
       id: 6,
       name: 'Broccoli',
-      price: 3.5,
-      imageUrl: 'https://picsum.photos/200/155',
+      price: 90.0,
+      imageUrl: 'https://images.pexels.com/photos/47347/broccoli-vegetable-food-healthy-47347.jpeg',
       description: 'Healthy broccoli, great for steaming and roasting.',
+      quantity: 0.5,
     ),
     Product(
       id: 7,
       name: 'Apple',
-      price: 1.0,
-      imageUrl: 'https://picsum.photos/200/156',
+      price: 35.0,
+      imageUrl: 'https://images.pexels.com/photos/206959/pexels-photo-206959.jpeg',
       description: 'A crisp and sweet apple, perfect for a quick snack.',
+      quantity: 1.0,
     ),
     Product(
       id: 8,
       name: 'Banana',
-      price: 0.75,
-      imageUrl: 'https://picsum.photos/200/157',
+      price: 40.0,
+      imageUrl: 'https://images.pexels.com/photos/1093038/pexels-photo-1093038.jpeg',
       description: 'A creamy and convenient banana, great for potassium.',
+      quantity: 1.0,
     ),
     Product(
       id: 9,
       name: 'Orange',
-      price: 1.25,
-      imageUrl: 'https://picsum.photos/200/158',
+      price: 50.0,
+      imageUrl: 'https://images.pexels.com/photos/327098/pexels-photo-327098.jpeg',
       description: 'A juicy and citrusy orange, rich in Vitamin C.',
+      quantity: 1.0,
     ),
     Product(
       id: 10,
       name: 'Grapes',
-      price: 2.0,
-      imageUrl: 'https://picsum.photos/200/159',
+      price: 70.0,
+      imageUrl: 'https://images.pexels.com/photos/708777/pexels-photo-708777.jpeg',
       description: 'Sweet and refreshing grapes, perfect for snacking.',
+      quantity: 0.5,
     ),
     Product(
       id: 11,
       name: 'Strawberry',
-      price: 3.0,
-      imageUrl: 'https://picsum.photos/200/160',
+      price: 120.0,
+      imageUrl: 'https://images.pexels.com/photos/89778/strawberries-fruit-food-freshness-89778.jpeg',
       description: 'Delicious and vibrant strawberries, great for desserts.',
+      quantity: 0.25,
     ),
     Product(
       id: 12,
       name: 'Blueberry',
-      price: 4.0,
-      imageUrl: 'https://picsum.photos/200/161',
+      price: 180.0,
+      imageUrl: 'https://images.pexels.com/photos/87818/background-berries-berry-blueberries-87818.jpeg',
       description: 'Antioxidant-rich blueberries, ideal for smoothies and cereals.',
+      quantity: 0.25,
     ),
   ];
 
@@ -147,6 +198,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double get _totalPrice => products.fold(0, (previousValue, product) {
         return previousValue + ((_cart[product.id] ?? 0) * product.price);
+      });
+
+  double get _totalWeight => products.fold(0, (previousValue, product) {
+        return previousValue + ((_cart[product.id] ?? 0) * product.quantity);
       });
 
   void _addToCart(Product product) {
@@ -167,7 +222,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _increaseQuantity(Product product) {
     setState(() {
-      _cart.update(product.id, (value) => value + 1);
+      _cart.update(
+        product.id,
+        (value) => value + 1,
+        ifAbsent: () => 1,
+      );
     });
   }
 
@@ -191,32 +250,46 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VeggieGo: Fruits and Vegetables'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: SizedBox(
-              width: 200,
-              child: TextField(
-                decoration: const InputDecoration(
-                  hintText: 'Search fruits and vegetables...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
-                ),
-                style: const TextStyle(color: Colors.white),
-                onChanged: _updateSearchTerm,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'VeggieGo',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
+            const SizedBox(height: 2),
+            const Text(
+              'Fresh & Organic',
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 4),
+            SearchBar(
+              onSearch: _updateSearchTerm,
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'Best Quality Fruits & Vegetables',
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.white70,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+        toolbarHeight: 100, // Fixed height for AppBar
+        actions: [
           Stack(
             alignment: Alignment.topRight,
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart),
+                icon: const Icon(Icons.shopping_cart, size: 20),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -234,11 +307,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               if (_totalItems > 0)
                 CircleAvatar(
-                  radius: 10,
+                  radius: 8,
                   backgroundColor: Colors.yellow,
                   child: Text(
-                    _totalItems.toString(),
-                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                    '${_totalItems}\n${_totalWeight.toStringAsFixed(1)}kg',
+                    style: const TextStyle(fontSize: 7, color: Colors.black),
+                    textAlign: TextAlign.center,
                   ),
                 ),
             ],
@@ -249,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16.0),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.75,
+          childAspectRatio: 0.7,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
@@ -262,66 +336,68 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AspectRatio(
-                  aspectRatio: 1.3,
+                  aspectRatio: 1.6,
                   child: Image.network(
                     product.imageUrl,
                     fit: BoxFit.cover,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         product.name,
-                        style: Theme.of(context).textTheme.titleLarge,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 1),
                       Text(
-                        '\$${product.price.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        '₹${product.price.toStringAsFixed(0)} / ${product.quantity}kg',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
                       ),
                     ],
                   ),
                 ),
                 const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size.fromHeight(40),
-                    ),
-                    onPressed: () => _addToCart(product),
-                    child: const Text('Add to Cart'),
-                  ),
-                ),
                 if (_cart[product.id] != null && _cart[product.id]! > 0)
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         IconButton.filledTonal(
                           onPressed: () => _decreaseQuantity(product),
-                          icon: const Icon(Icons.remove),
-                          style: const IconButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
+                          icon: const Icon(Icons.remove, size: 16),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                         ),
-                        Text('Quantity: ${_cart[product.id]}'),
+                        Text('${_cart[product.id]}', style: const TextStyle(fontSize: 12)),
                         IconButton.filledTonal(
                           onPressed: () => _increaseQuantity(product),
-                          icon: const Icon(Icons.add),
-                          style: const IconButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
+                          icon: const Icon(Icons.add, size: 16),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                         ),
                       ],
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(32),
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                      ),
+                      onPressed: () => _addToCart(product),
+                      child: const Text('Add to Cart', style: TextStyle(fontSize: 12)),
                     ),
                   ),
               ],
@@ -343,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class ShoppingCartScreen extends StatelessWidget {
+class ShoppingCartScreen extends StatefulWidget {
   const ShoppingCartScreen({
     super.key,
     required this.cart,
@@ -360,8 +436,15 @@ class ShoppingCartScreen extends StatelessWidget {
   final Function(Product) removeFromCart;
 
   @override
+  State<ShoppingCartScreen> createState() => _ShoppingCartScreenState();
+}
+
+class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
+  @override
   Widget build(BuildContext context) {
-    final cartItems = products.where((product) => cart[product.id] != null).toList();
+    final cartItems = widget.products.where((product) => widget.cart[product.id] != null).toList();
+    final totalPrice = calculateTotalPrice(widget.cart, widget.products);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shopping Cart'),
@@ -381,51 +464,100 @@ class ShoppingCartScreen extends StatelessWidget {
                   ),
                   title: Text(product.name),
                   subtitle: Text(
-                      '\$${product.price.toStringAsFixed(2)} x ${cart[product.id]}'),
+                      '₹${product.price.toStringAsFixed(0)} × ${widget.cart[product.id]} (${(product.quantity * widget.cart[product.id]!).toStringAsFixed(2)}kg)'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => decreaseQuantity(product),
+                        onPressed: () {
+                          widget.decreaseQuantity(product);
+                          setState(() {}); // Force rebuild
+                        },
                         icon: const Icon(Icons.remove),
+                        color: Colors.red,
                       ),
-                      Text(cart[product.id].toString()),
+                      Text(
+                        widget.cart[product.id].toString(),
+                        style: const TextStyle(fontSize: 16),
+                      ),
                       IconButton(
-                        onPressed: () => increaseQuantity(product),
+                        onPressed: () {
+                          widget.increaseQuantity(product);
+                          setState(() {}); // Force rebuild
+                        },
                         icon: const Icon(Icons.add),
+                        color: Colors.green,
                       ),
                       IconButton(
-                        onPressed: () => removeFromCart(product),
+                        onPressed: () {
+                          widget.removeFromCart(product);
+                          setState(() {}); // Force rebuild
+                        },
                         icon: const Icon(Icons.delete),
+                        color: Colors.red,
                       ),
                     ],
                   ),
                 );
               },
             ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
+bottomNavigationBar: BottomAppBar(
+  color: Colors.white,
+  elevation: 4.0,
+  child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+    width: double.infinity,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF2E7D32),
+        elevation: 8,
+        minimumSize: const Size(double.infinity, 56), // Full width and fixed height
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        shadowColor: Colors.green[700],
+        alignment: Alignment.center, // Ensure center alignment
+        
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentScreen(totalPrice: totalPrice),
+          ),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total: \$${calculateTotalPrice(cart, products).toStringAsFixed(2)}'),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentScreen(
-                          totalPrice: calculateTotalPrice(cart, products)),
-                    ),
-                  );
-                },
-                child: const Text('Checkout'),
+              Text(
+                'Total:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+              Text(
+                '₹${totalPrice.toStringAsFixed(0)}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
+    ),
+  ),
+),
+
     );
   }
 
@@ -527,7 +659,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   },
                   child: _isCheckingOut
                       ? const CircularProgressIndicator()
-                      : Text('Pay \$${widget.totalPrice.toStringAsFixed(2)}'),
+                      : Text('Pay ₹${widget.totalPrice.toStringAsFixed(0)}'),
                 ),
               ),
             ],
@@ -552,6 +684,7 @@ class Product {
   final double price;
   final String imageUrl;
   final String description;
+  final double quantity;
 
   Product({
     required this.id,
@@ -559,5 +692,6 @@ class Product {
     required this.price,
     required this.imageUrl,
     required this.description,
+    required this.quantity,
   });
 }
