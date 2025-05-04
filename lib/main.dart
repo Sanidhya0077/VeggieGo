@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 void main() {
   runApp(const VeggieGoApp());
@@ -412,15 +414,15 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).colorScheme.secondary,
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
+      bottomNavigationBar: Padding(
+        // color: Theme.of(context).colorScheme.secondary,
+        
+          padding: const EdgeInsets.all(2.0),
+          // height:40,
           child: Text(
             '© ${DateTime.now().year} VeggieGo. All rights reserved.',
             textAlign: TextAlign.center,
           ),
-        ),
       ),
     );
   }
@@ -451,6 +453,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   Widget build(BuildContext context) {
     final cartItems = widget.products.where((product) => widget.cart[product.id] != null).toList();
     final totalPrice = calculateTotalPrice(widget.cart, widget.products);
+    cartItems.forEach((product) {
+    // totalPrice += product.price * widget.cart[product.id]!;
+    });
     
     return Scaffold(
       appBar: AppBar(
@@ -508,62 +513,72 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 );
               },
             ),
-bottomNavigationBar: BottomAppBar(
-  color: Colors.white,
-  elevation: 4.0,
-  child: Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-    width: double.infinity,
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        // backgroundColor: const Color(0xFF2E7D32),
-        elevation: 8,
-        minimumSize: const Size(double.infinity, 56), // Full width and fixed height
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+bottomNavigationBar: Container(
+  height: 100, 
+  color: Colors.grey[100],
+  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+  child: Column(
+    mainAxisSize: MainAxisSize.max,
+    children: [
+      Container(
+        height: 40, // Fixed height for the Row
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Total:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+              '₹${totalPrice.toStringAsFixed(0)}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ],
         ),
-        // shadowColor: Colors.green[700],
-        alignment: Alignment.center, // Ensure center alignment
-        
       ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PaymentScreen(totalPrice: totalPrice),
-          ),
-        );
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+      Expanded(
+        child: Container(
+          alignment: Alignment.center,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3E8E41),
+              elevation: 8,
+              minimumSize: Size(double.infinity, 30), 
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(70),
               ),
-              Text(
-                '₹${totalPrice.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+              shadowColor: Colors.green[300],
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentScreen(totalPrice: totalPrice),
                 ),
+              );
+            },
+            child: Text(
+              'Proceed to Pay',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-            ],
+            ),
           ),
-        ],
+        ),
       ),
-    ),
+    ],
   ),
-),
+)
 
     );
   }
@@ -575,6 +590,8 @@ bottomNavigationBar: BottomAppBar(
   }
 }
 
+
+
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key, required this.totalPrice});
 
@@ -585,12 +602,22 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  
   final _formKey = GlobalKey<FormState>();
   final _cardNumberController = TextEditingController();
   final _expiryDateController = TextEditingController();
   final _cvvController = TextEditingController();
+  final _upiAddressController = TextEditingController();
 
   bool _isCheckingOut = false;
+  String _paymentMethod = 'card';
+  String _upiQrCodeData = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _upiQrCodeData = 'upi://pay?pa=your-upi-id@oksbi&pn=Merchant&am=${widget.totalPrice}&cu=INR';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -598,53 +625,158 @@ class _PaymentScreenState extends State<PaymentScreen> {
       appBar: AppBar(title: const Text('Payment')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _cardNumberController,
-                decoration: const InputDecoration(labelText: 'Card Number'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter card number';
-                  }
-                  if (value.length != 16) {
-                    return 'Card number must be 16 digits';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _expiryDateController,
-                decoration: const InputDecoration(labelText: 'Expiry Date (MM/YY)'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter expiry date';
-                  }
-                  if (value.length != 5) {
-                    return 'Expiry date must be in MM/YY format';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _cvvController,
-                decoration: const InputDecoration(labelText: 'CVV'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter CVV';
-                  }
-                  if (value.length != 3) {
-                    return 'CVV must be 3 digits';
-                  }
-                  return null;
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: ElevatedButton(
-                  onPressed: () async {
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _paymentMethod = 'card';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _paymentMethod == 'card'
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[300],
+                    ),
+                    child: Text(
+                      'Card',
+                      style: TextStyle(
+                        color: _paymentMethod == 'card'
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _paymentMethod = 'upi';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _paymentMethod == 'upi'
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[300],
+                    ),
+                    child: Text(
+                      'UPI',
+                      style: TextStyle(
+                        color: _paymentMethod == 'upi'
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _paymentMethod = 'qr';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _paymentMethod == 'qr'
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[300],
+                    ),
+                    child: Text(
+                      'QR Code',
+                      style: TextStyle(
+                        color: _paymentMethod == 'qr'
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            _paymentMethod == 'card'
+                ? Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _cardNumberController,
+                          decoration:
+                              const InputDecoration(labelText: 'Card Number'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter card number';
+                            }
+                            if (value.length != 16) {
+                              return 'Card number must be 16 digits';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          controller: _expiryDateController,
+                          decoration: const InputDecoration(
+                              labelText: 'Expiry Date (MM/YY)'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter expiry date';
+                            }
+                            if (value.length != 5) {
+                              return 'Expiry date must be in MM/YY format';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          controller: _cvvController,
+                          decoration: const InputDecoration(labelText: 'CVV'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter CVV';
+                            }
+                            if (value.length != 3) {
+                              return 'CVV must be 3 digits';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                : _paymentMethod == 'upi'
+                    ? TextFormField(
+                        controller: _upiAddressController,
+                        decoration:
+                            const InputDecoration(labelText: 'UPI Address'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter UPI address';
+                          }
+                          return null;
+                        },
+                      )
+                    : Column(
+                        children: [
+                          QrImageView(
+                            data: _upiQrCodeData,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                          ),
+                          SizedBox(height: 16),
+                          Text('Scan QR code to pay'),
+                        ],
+                      ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_paymentMethod == 'card') {
                     if (_formKey.currentState!.validate()) {
                       setState(() {
                         _isCheckingOut = true;
@@ -663,14 +795,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       }
                       Navigator.popUntil(context, (route) => route.isFirst);
                     }
-                  },
-                  child: _isCheckingOut
-                      ? const CircularProgressIndicator()
-                      : Text('Pay ₹${widget.totalPrice.toStringAsFixed(0)}'),
-                ),
+                  } else if (_paymentMethod == 'upi') {
+                    final Uri uri = Uri.parse(
+                      'upi://pay?pa=${_upiAddressController.text}&pn=Merchant&am=${widget.totalPrice}&cu=INR',
+                    );
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to initiate payment')),
+                      );
+                    }
+                  } else {
+                    // Handle QR code payment
+                  }
+                },
+                child: _isCheckingOut
+                    ? const CircularProgressIndicator()
+                    : Text('Pay ₹${widget.totalPrice.toStringAsFixed(0)}'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -681,6 +826,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _cardNumberController.dispose();
     _expiryDateController.dispose();
     _cvvController.dispose();
+    _upiAddressController.dispose();
     super.dispose();
   }
 }

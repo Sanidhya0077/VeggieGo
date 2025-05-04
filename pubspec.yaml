@@ -1,17 +1,18 @@
-
-name: veggiego
+name: VeggieGo
 description: A mobile app for local vegetable vendors.
 
-publish_to: 'none' # Remove this line to enable publishing
+publish_to: "none" # Remove this line to enable publishing
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  url_launcher: ^6.1.5
+  qr_flutter: ^4.0.0
 
   cupertino_icons: ^1.0.2
 
